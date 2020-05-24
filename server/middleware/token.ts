@@ -27,7 +27,6 @@ export const verifyToken = (
           .send({ success: false, response: 'Invalid token' });
       }
     }
-    console.log('lol');
 
     return res
       .status(401)
