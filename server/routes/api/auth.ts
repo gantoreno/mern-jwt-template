@@ -32,10 +32,7 @@ router.post('/login', async (req: Request, res: Response) => {
     const isValid = user.comparePassword(password);
 
     if (isValid) {
-      const plainUser = user.toJSON();
-
-      delete plainUser['password'];
-      delete plainUser['__v'];
+      const plainUser: object = user.toPlainObject();
 
       const token: string = jwt.sign(plainUser, process.env.JWT_SECRET!, {
         expiresIn: '1d',
@@ -79,10 +76,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     await user.save();
 
-    const plainUser = user.toJSON();
-
-    delete plainUser['password'];
-    delete plainUser['__v'];
+    const plainUser: object = user.toPlainObject();
 
     const token: string = jwt.sign(plainUser, process.env.JWT_SECRET!, {
       expiresIn: '1d',

@@ -6,6 +6,7 @@ export interface IUser extends Document {
   password: string;
   encryptPassword(password: string): string;
   comparePassword(password: string): boolean;
+  toPlainObject(): object;
 }
 
 const UserSchema: Schema = new Schema({
@@ -25,6 +26,15 @@ UserSchema.methods.encryptPassword = function (password: string): string {
 
 UserSchema.methods.comparePassword = function (password: string): boolean {
   return bcrypt.compareSync(password, this.password);
+};
+
+UserSchema.methods.toPlainObject = function (): object {
+  const plainUser: any = this.toJSON();
+
+  delete plainUser['password'];
+  delete plainUser['__v'];
+
+  return plainUser;
 };
 
 export const User: Model<IUser> = model<IUser>('users', UserSchema);
