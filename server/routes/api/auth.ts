@@ -1,43 +1,43 @@
 import { Router, Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { User, IUser } from '../../models/user.model';
-import { verifyToken, isLoggedIn } from '../../middleware/auth';
+import { verifyToken } from '../../middleware/token';
 
 const router: Router = Router();
 
 router.get('/me', verifyToken, async (req: Request, res: Response) => {
   const { token } = req.session!;
-  const { email, password } = <any>jwt.verify(token, process.env.JWT_SECRET!);
+  const user: any = jwt.verify(token, process.env.JWT_SECRET!);
 
-  const user: IUser | null = await User.findOne({ email, password });
+  delete user['iat'];
+  delete user['exp'];
 
-  if (user) {
-    return res.status(200).send({
-      success: true,
-      user: user,
-      response: 'User successfully fetched',
-    });
-  }
-
-  return res
-    .status(401)
-    .send({ success: false, user: null, response: 'User does not exist' });
+  return res.status(200).send({
+    success: true,
+    user: user,
+    response: 'User successfully fetched',
+  });
 });
 
-router.get('/protected', isLoggedIn, (_, res: Response) => {
+router.get('/protected', verifyToken, (_, res: Response) => {
   return res.status(200).send({ succes: true, response: 'You rock!' });
 });
 
 router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  const user: IUser | null = await User.findOne({ email });
+  let user: IUser | null = await User.findOne({ email });
 
   if (user) {
     const isValid = user.comparePassword(password);
 
     if (isValid) {
-      const token: string = jwt.sign(user.toJSON(), process.env.JWT_SECRET!, {
+      const plainUser = user.toJSON();
+
+      delete plainUser['password'];
+      delete plainUser['__v'];
+
+      const token: string = jwt.sign(plainUser, process.env.JWT_SECRET!, {
         expiresIn: '1d',
       });
 
@@ -45,7 +45,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
       return res.status(200).send({
         success: true,
-        user: user,
+        user: plainUser,
         response: 'Successfully logged in',
       });
     }
@@ -60,7 +60,7 @@ router.post('/login', async (req: Request, res: Response) => {
     .send({ success: false, user: null, response: 'User not found' });
 });
 
-router.post('/logout', isLoggedIn, (req: Request, res: Response) => {
+router.post('/logout', verifyToken, (req: Request, res: Response) => {
   req.session!.token = null;
 
   return res
@@ -79,15 +79,22 @@ router.post('/register', async (req: Request, res: Response) => {
 
     await user.save();
 
-    const token: string = jwt.sign(user.toJSON(), process.env.JWT_SECRET!, {
+    const plainUser = user.toJSON();
+
+    delete plainUser['password'];
+    delete plainUser['__v'];
+
+    const token: string = jwt.sign(plainUser, process.env.JWT_SECRET!, {
       expiresIn: '1d',
     });
 
     req.session!.token = token;
 
-    return res
-      .status(201)
-      .send({ success: true, user: user, response: 'Successfully registered' });
+    return res.status(201).send({
+      success: true,
+      user: plainUser,
+      response: 'Successfully registered',
+    });
   }
 
   return res
