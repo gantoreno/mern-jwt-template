@@ -31,7 +31,11 @@ export const login = (email: string, password: string) => async (
         request: {
           success: success,
           response: response,
-          errors: { onLogin: true, onRegister: false, onLoad: false },
+          errors: {
+            onLogin: true,
+            onRegister: false,
+            onLoad: false,
+          },
         },
       },
     });

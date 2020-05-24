@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { Layout } from '../components/ui/Layout';
+import { Preloader } from '../components/ui/Preloader';
 import { login } from '../redux/actions/authActions';
 import { validateEmail, validatePassword } from '../utils/formValidator';
 
@@ -24,6 +25,10 @@ export const Login: React.FC = () => {
   const cardStyles = {
     maxWidth: '500px',
   };
+
+  if (isLoading && !request.errors.onLoad && !request.errors.onLogin) {
+    return <Preloader />;
+  }
 
   return (
     <Layout>

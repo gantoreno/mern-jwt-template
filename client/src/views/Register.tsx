@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Container, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { Layout } from '../components/ui/Layout';
+import { Preloader } from '../components/ui/Preloader';
 import { register } from '../redux/actions/authActions';
 import {
   validateEmail,
@@ -29,6 +30,10 @@ export const Register: React.FC = () => {
   const cardStyles = {
     maxWidth: '500px',
   };
+
+  if (isLoading && !request.errors.onLoad && !request.errors.onLogin) {
+    return <Preloader />;
+  }
 
   return (
     <Layout>
