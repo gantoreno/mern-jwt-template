@@ -7,6 +7,7 @@ export const verifyToken = (
   next: NextFunction
 ) => {
   if (req.session) {
+    console.log(req.session);
     if (req.session.token) {
       const { token } = req.session;
 
@@ -20,11 +21,13 @@ export const verifyToken = (
           return next();
         }
       } catch (e) {
+        console.log(e.response);
         return res
           .status(401)
           .send({ success: false, response: 'Invalid token' });
       }
     }
+    console.log('lol');
 
     return res
       .status(401)

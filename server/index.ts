@@ -12,17 +12,25 @@ import { authRouter } from './routes/api/auth';
   const app: express.Application = express();
   const PORT: string | number = process.env.PORT || 5000;
 
-  app.use(cors());
+  app.use(
+    cors({
+      credentials: true,
+    })
+  );
   app.use(morgan('dev'));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
   app.use(
     session({
       secret: process.env.SESSION_SECRET!,
       resave: false,
       saveUninitialized: false,
+      cookie: {
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+      },
     })
   );
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
 
   app.use('/api/auth', authRouter);
 
