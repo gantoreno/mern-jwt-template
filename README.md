@@ -9,7 +9,7 @@ A basic [JWT](https://jwt.io/) authentication boilerplate, using [MongoDB](https
 First, clone the repo:
 
 ```sh
-$ git clone https://github.com/hollandsgabe/mern-jwt-template.git # Or fork the project
+$ git clone https://github.com/gantoreno/mern-jwt-template.git # Or fork the project
 $ cd mern-jwt-template
 ```
 
